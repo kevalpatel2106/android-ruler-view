@@ -126,6 +126,11 @@ final class RulerView extends View {
     private int mShortIndicatorHeight = 0;
 
     /**
+     * Allows to customise the step of the long indicator
+     */
+    private int mLongIndicatorStep = 5 /* Default value */;
+
+    /**
      * Integer color of the text, that is displayed on the ruler.
      *
      * @see #setTextColor(int)
@@ -236,6 +241,11 @@ final class RulerView extends View {
                     mMaxValue = a.getInteger(R.styleable.RulerView_max_value, 100);
                 }
                 setValueRange(mMinValue, mMaxValue);
+                if (a.hasValue(R.styleable.RulerValuePicker_long_indicator_step)){
+                    mLongIndicatorStep = a.getInteger(R.styleable.RulerValuePicker_long_indicator_step, 5);
+                    if (mLongIndicatorStep < 1)
+                        mLongIndicatorStep = 5; /*Fallback to default to prevent unexpected behaviour*/
+                }
             } finally {
                 a.recycle();
             }
@@ -266,7 +276,7 @@ final class RulerView extends View {
         //Iterate through all value
         for (int value = 1; value < mMaxValue - mMinValue; value++) {
 
-            if (value % 5 == 0) {
+            if (value % mLongIndicatorStep == 0) {
                 drawLongIndicator(canvas, value);
                 drawValueText(canvas, value);
             } else {
