@@ -221,7 +221,7 @@ final class RulerView extends View {
 
                 if (a.hasValue(R.styleable.RulerView_indicator_interval)) {
                     mIndicatorInterval = a.getDimensionPixelSize(R.styleable.RulerView_indicator_interval,
-                            4);
+                            14);
                 }
 
                 if (a.hasValue(R.styleable.RulerView_long_height_height_ratio)) {
@@ -274,7 +274,7 @@ final class RulerView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         //Iterate through all value
-        for (int value = 1; value < mMaxValue - mMinValue; value++) {
+        for (int value = 1; value <= mMaxValue - mMinValue; value++) {
 
             if (value % mLongIndicatorStep == 0) {
                 drawLongIndicator(canvas, value);
@@ -284,11 +284,21 @@ final class RulerView extends View {
             }
         }
 
-        //Draw the first indicator.
-        drawSmallIndicator(canvas, 0);
+        if (mLongIndicatorStep != 1) {//because 1 means that we want every step marked with labels
+            //Draw the first indicator.
+            drawSmallIndicator(canvas, 0);
 
-        //Draw the last indicator.
-        drawSmallIndicator(canvas, getWidth());
+            //Draw the last indicator.
+            drawSmallIndicator(canvas, getWidth());
+        }{
+            //Draw the first indicator as long
+            drawLongIndicator(canvas, 0);
+            drawValueText(canvas, 0);
+
+            //Draw the last indicator as long
+            drawLongIndicator(canvas, getWidth());
+            drawValueText(canvas, getWidth());
+        }
         super.onDraw(canvas);
     }
 
@@ -296,7 +306,7 @@ final class RulerView extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         //Measure dimensions
         mViewHeight = MeasureSpec.getSize(heightMeasureSpec);
-        int viewWidth = (mMaxValue - mMinValue - 1) * mIndicatorInterval;
+        int viewWidth = (mMaxValue - mMinValue + 2) * mIndicatorInterval;//+2 are artificially added to have more space for first and last indicator drawValueText()
 
         updateIndicatorHeight(mLongIndicatorHeightRatio, mShortIndicatorHeightRatio);
 
@@ -324,9 +334,9 @@ final class RulerView extends View {
      */
     private void drawSmallIndicator(@NonNull final Canvas canvas,
                                     final int value) {
-        canvas.drawLine(mIndicatorInterval * value,
+        canvas.drawLine(mIndicatorInterval * (value+1),//extra 1 for spacing which we artificially added in case the labels may wanna get drawn
                 0,
-                mIndicatorInterval * value,
+                mIndicatorInterval * (value+1),//extra 1 for spacing which we artificially added in case the labels may wanna get drawn
                 mShortIndicatorHeight,
                 mIndicatorPaint);
     }
@@ -339,9 +349,9 @@ final class RulerView extends View {
      */
     private void drawLongIndicator(@NonNull final Canvas canvas,
                                    final int value) {
-        canvas.drawLine(mIndicatorInterval * value,
+        canvas.drawLine(mIndicatorInterval * (value+1),//extra 1 for spacing which we artificially added in case the labels may wanna get drawn
                 0,
-                mIndicatorInterval * value,
+                mIndicatorInterval * (value+1),//extra 1 for spacing which we artificially added in case the labels may wanna get drawn
                 mLongIndicatorHeight,
                 mIndicatorPaint);
     }
@@ -356,7 +366,7 @@ final class RulerView extends View {
     private void drawValueText(@NonNull final Canvas canvas,
                                final int value) {
         canvas.drawText(String.valueOf(value + mMinValue),
-                mIndicatorInterval * value,
+                mIndicatorInterval * (value+1), //extra 1 for spacing which we artificially added in case the labels may wanna get drawn
                 mLongIndicatorHeight + mTextPaint.getTextSize(),
                 mTextPaint);
     }
@@ -442,6 +452,23 @@ final class RulerView extends View {
         refreshPaint();
     }
 
+    /**
+     * Set a step for a long indictor to be drawn.
+     * Every step a long indicator will be drawn.
+     * @param step - Step in decimal
+     */
+    void setLongIndicatorStep(final int step){
+        mLongIndicatorStep = step;
+        refreshPaint();
+    }
+
+    /**
+     * @return Long indicator step
+     * @see #setLongIndicatorStep(int)
+     */
+    int getLongIndicatorStep(){
+        return mLongIndicatorStep;
+    }
 
     /**
      * @return Get the minimum value displayed on the ruler.
