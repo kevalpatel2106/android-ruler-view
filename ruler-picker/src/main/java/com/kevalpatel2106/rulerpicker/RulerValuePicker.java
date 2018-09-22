@@ -315,22 +315,39 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
      *              will be selected.
      */
     public void selectValue(final int value) {
-        mHorizontalScrollView.postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                int valuesToScroll;
-                if (value < mRulerView.getMinValue()) {
-                    valuesToScroll = 0;
-                } else if (value > mRulerView.getMaxValue()) {
-                    valuesToScroll = mRulerView.getMaxValue() - mRulerView.getMinValue();
-                } else {
-                    valuesToScroll = value - mRulerView.getMinValue();
-                }
+        selectValueDelayed(value, 0);
+    }
 
-                mHorizontalScrollView.smoothScrollTo(
-                        (valuesToScroll+1) * mRulerView.getIndicatorIntervalWidth(), 0);//extra 1 for spacing which we artificially added in case the labels may wanna get drawn
-            }
-        }, 400);
+    /**
+     * Scroll the ruler to the given value.
+     * If value isn't reached yet - loop with delay 3 times till we manage to set the value ASAP.
+     * @param value Value to select. Value must be between {@link #getMinValue()} and {@link #getMaxValue()}.
+     *              If the value is less than {@link #getMinValue()}, {@link #getMinValue()} will be
+     *              selected.If the value is greater than {@link #getMaxValue()}, {@link #getMaxValue()}
+     *              will be selected.
+     * @param iteration - initial call should pass 0, the rest are done internally
+     */
+    private void selectValueDelayed(final int value, final int iteration){
+        int valuesToScroll;
+        if (value < mRulerView.getMinValue()) {
+            valuesToScroll = 0;
+        } else if (value > mRulerView.getMaxValue()) {
+            valuesToScroll = mRulerView.getMaxValue() - mRulerView.getMinValue();
+        } else {
+            valuesToScroll = value - mRulerView.getMinValue();
+        }
+
+        mHorizontalScrollView.smoothScrollTo(
+                (valuesToScroll+1) * mRulerView.getIndicatorIntervalWidth(), 0);//extra 1 for spacing which we artificially added in case the labels may wanna get drawn
+
+        if (getCurrentValue() != value && iteration < 3) {//loop protection with iteration from infinity
+            mHorizontalScrollView.postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    selectValueDelayed(value, iteration+1);//we rise iteration for loop protection
+                }
+            }, 100);//maybe MhorizontalScrollView will be initialized faster than 400ms?
+        }
     }
 
     /**
