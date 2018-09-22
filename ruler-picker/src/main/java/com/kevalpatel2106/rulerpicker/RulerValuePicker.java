@@ -195,6 +195,12 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
                     setMinMaxValue(a.getInteger(R.styleable.RulerValuePicker_min_value, 0),
                             a.getInteger(R.styleable.RulerValuePicker_max_value, 100));
                 }
+                if (a.hasValue(R.styleable.RulerValuePicker_long_indicator_step)){
+                    int mLongIndicatorStep = a.getInteger(R.styleable.RulerValuePicker_long_indicator_step, 5);
+                    if (mLongIndicatorStep < 1)
+                        mLongIndicatorStep = 5; /*Fallback to default to prevent unexpected behaviour*/
+                    setLongIndicatorStep(mLongIndicatorStep);
+                }
             } finally {
                 a.recycle();
             }
@@ -322,7 +328,7 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
                 }
 
                 mHorizontalScrollView.smoothScrollTo(
-                        valuesToScroll * mRulerView.getIndicatorIntervalWidth(), 0);
+                        (valuesToScroll+1) * mRulerView.getIndicatorIntervalWidth(), 0);//extra 1 for spacing which we artificially added in case the labels may wanna get drawn
             }
         }, 400);
     }
@@ -332,7 +338,7 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
      */
     public int getCurrentValue() {
         int absoluteValue = mHorizontalScrollView.getScrollX() / mRulerView.getIndicatorIntervalWidth();
-        int value = mRulerView.getMinValue() + absoluteValue;
+        int value = mRulerView.getMinValue() + absoluteValue - 1;//extra 1 for spacing which we artificially added in case the labels may wanna get drawn
 
         if (value > mRulerView.getMaxValue()) {
             return mRulerView.getMaxValue();
@@ -533,6 +539,26 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
      */
     public void setIndicatorWidth(final int widthPx) {
         mRulerView.setIndicatorWidth(widthPx);
+    }
+
+    /**
+     * Set a step for a long indictor to be drawn.
+     * Every step a long indicator will be drawn.
+     * @param step - Step in decimal
+     * @see #getLongIndicatorStep()
+     * @see RulerView#mLongIndicatorStep
+     */
+    public void setLongIndicatorStep(final int step){
+        mRulerView.setLongIndicatorStep(step);
+    }
+
+    /**
+     * @return Long indicator step
+     * @see #setLongIndicatorStep(int)
+     * @see RulerView#mLongIndicatorStep
+     */
+    public int getLongIndicatorStep(){
+        return mRulerView.getLongIndicatorStep();
     }
 
     /**
