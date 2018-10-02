@@ -34,6 +34,7 @@ import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.HorizontalScrollView;
 import android.widget.LinearLayout;
 
 
@@ -192,7 +193,7 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
 
                 if (a.hasValue(R.styleable.RulerValuePicker_min_value) ||
                         a.hasValue(R.styleable.RulerValuePicker_max_value)) {
-                    setMinMaxValue(a.getInteger(R.styleable.RulerValuePicker_min_value, 0),
+                    initializeMinMaxValue(a.getInteger(R.styleable.RulerValuePicker_min_value, 0),
                             a.getInteger(R.styleable.RulerValuePicker_max_value, 100));
                 }
                 if (a.hasValue(R.styleable.RulerValuePicker_long_indicator_step)){
@@ -315,19 +316,34 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
      *              will be selected.
      */
     public void selectValue(final int value) {
-        selectValueDelayed(value, 0);
+        //System.out.println("Save RulerValuePicker selectValue="+value+" called");
+        this.value = value;
+        selectValueDelayed(0);
     }
 
     /**
+     * Because selectValue can be called multiple times and each of them will cause a delayed selection - we rather keep the last value from the
+     * caller and concentrate on displaying only it not middle random calls.
+     */
+    private int value;
+
+    /**
+     * More precice method on returning the set value - usefull during rotation, etc.
+     * @return
+     */
+    public int getValue(){
+        return value;
+    }
+    /**
      * Scroll the ruler to the given value.
      * If value isn't reached yet - loop with delay 3 times till we manage to set the value ASAP.
-     * @param value Value to select. Value must be between {@link #getMinValue()} and {@link #getMaxValue()}.
+     //* @param value Value to select. Value must be between {@link #getMinValue()} and {@link #getMaxValue()}.
      *              If the value is less than {@link #getMinValue()}, {@link #getMinValue()} will be
      *              selected.If the value is greater than {@link #getMaxValue()}, {@link #getMaxValue()}
      *              will be selected.
      * @param iteration - initial call should pass 0, the rest are done internally
      */
-    private void selectValueDelayed(final int value, final int iteration){
+    private void selectValueDelayed(/*final int value, */ final int iteration){
         int valuesToScroll;
         if (value < mRulerView.getMinValue()) {
             valuesToScroll = 0;
@@ -340,17 +356,25 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
         mHorizontalScrollView.smoothScrollTo(
                 (valuesToScroll+1) * mRulerView.getIndicatorIntervalWidth(), 0);//extra 1 for spacing which we artificially added in case the labels may wanna get drawn
 
-        if (getCurrentValue() != value && iteration < 3) {//loop protection with iteration from infinity
-            mHorizontalScrollView.postDelayed(new Runnable() {
-                @Override
-                public void run() {
-                    selectValueDelayed(value, iteration+1);//we rise iteration for loop protection
+        //we have all the condition in postDelay, because smoothScrollTo is asynchronious and will take time to finish
+        mHorizontalScrollView.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                if (getCurrentValue() != value && //for the rest value selection
+                        iteration < 3 || //loop protection with iteration from infinity
+                        mHorizontalScrollView.getScrollX() == 0 //if minimum value is initially selected, but we actually have extra spaces (for the text) in front and back of the ruler, so it can't be 0.
+                        ) {
+                    selectValueDelayed(iteration + 1);//we rise iteration for loop protection
                 }
-            }, 100);//maybe MhorizontalScrollView will be initialized faster than 400ms?
-        }
+            }
+        }, 150);//maybe MhorizontalScrollView will be initialized faster than 400ms?
     }
 
     /**
+     * Not the best method to get current value as selection may be in progress
+     * but it is a good method to check weather we finally got our value selected
+     * and it is usefull during ruler initialization while smoothScrollTo will accept values
+     * but in reality - there will be no changes till it's fully initialized.
      * @return Get the current selected value.
      */
     public int getCurrentValue() {
@@ -381,10 +405,21 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
 
     private void makeOffsetCorrection(final int indicatorInterval) {
         int offsetValue = mHorizontalScrollView.getScrollX() % indicatorInterval;
-        if (offsetValue < indicatorInterval / 2) {
+        /*
+        Uncommenting the code in this function would make left / right boundaries strict on their values.
+        But eventually i've noticed it's nicer when you're able to scroll around without
+        these restrictions.
+         */
+        //int maxScrollX = indicatorInterval * getMaxValue();
+        if (offsetValue < indicatorInterval / 2 ){//&&
+                //mHorizontalScrollView.getScrollX() >= indicatorInterval && //this is our left padding of the indicator interval length
+                //mHorizontalScrollView.getScrollX() <= maxScrollX ){//this is our right edge of the padding
             mHorizontalScrollView.scrollBy(-offsetValue, 0);
         } else {
-            mHorizontalScrollView.scrollBy(indicatorInterval - offsetValue, 0);
+            //if (mHorizontalScrollView.getScrollX() <= maxScrollX)//if we're not on the right edge of the padding
+                mHorizontalScrollView.scrollBy(indicatorInterval - offsetValue, 0);
+            //else
+                //mHorizontalScrollView.scrollTo( maxScrollX, 0);//back to the right most max value
         }
     }
 
@@ -393,6 +428,9 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
         Parcelable superState = super.onSaveInstanceState();
         SavedState ss = new SavedState(superState);
         ss.value = getCurrentValue();
+        ss.minVal = getMinValue();//may change during runtime
+        ss.maxVal = getMaxValue();//may change during runtime
+        //System.out.println("Save RulerValuePicker onSave. "+getValue()+" or *"+getCurrentValue()+"* in ["+ss.minVal+"; "+ss.maxVal+"]");
         return ss;
     }
 
@@ -400,7 +438,10 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
     public void onRestoreInstanceState(Parcelable state) {
         SavedState ss = (SavedState) state;
         super.onRestoreInstanceState(ss.getSuperState());
+        //System.out.println("Save RulerValuePicker onRestore I. "+value+"  *"+getValue()+" / "+ getCurrentValue()+"* in ["+getMinValue()+"; "+getMaxValue()+"]");
+        setMinMaxValue(ss.minVal, ss.maxVal);
         selectValue(ss.value);
+        //System.out.println("Save RulerValuePicker onRestore II. "+value+" *"+getValue()+" / "+ getCurrentValue()+"* in ["+getMinValue()+"; "+getMaxValue()+"]");
     }
 
     //**********************************************************************************//
@@ -610,6 +651,11 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
     }
 
     /**
+     * If min / max values were set outside class
+     */
+    private boolean isMinMaxSet = false;
+
+    /**
      * Set the maximum value to display on the ruler. This will decide the range of values and number
      * of indicators that ruler will draw.
      *
@@ -621,6 +667,22 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
      * @see #getMaxValue()
      */
     public void setMinMaxValue(final int minValue, final int maxValue) {
+        //System.out.println("Save RulerValuePicker setMinMax("+minValue+", "+maxValue+");");
+        int oldDiff = mRulerView.getMaxValue() - mRulerView.getMinValue();
+        int curVal = getCurrentValue();
+        mRulerView.setValueRange(minValue, maxValue);
+        if (isMinMaxSet && oldDiff != maxValue - minValue) {//it means we need to recalculate width
+            mRulerView.triggerOnMeasure();
+        }
+        invalidate();
+        if (curVal >= minValue && curVal <= maxValue)
+            selectValue(curVal);//we select same old value on change if we can
+        else
+            selectValue(minValue);//we select minimum value once we're out of edges
+        isMinMaxSet = true;
+    }
+
+    private void initializeMinMaxValue(final int minValue, final int maxValue){
         mRulerView.setValueRange(minValue, maxValue);
         invalidate();
         selectValue(minValue);
@@ -714,6 +776,8 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
                 };
 
         private int value = 0;
+        private int minVal = 0;
+        private int maxVal = 0;
 
         SavedState(Parcelable superState) {
             super(superState);
@@ -722,12 +786,18 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
         private SavedState(Parcel in) {
             super(in);
             value = in.readInt();
+            minVal = in.readInt();
+            maxVal = in.readInt();
+            //System.out.println("SaveState: savedState="+value+" in ["+minVal+"; "+maxVal+"]");
         }
 
         @Override
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
             out.writeInt(value);
+            out.writeInt(minVal);
+            out.writeInt(maxVal);
+            //System.out.println("SaveState: writeToParcel="+value+" in ["+minVal+"; "+maxVal+"]");
         }
     }
 }
