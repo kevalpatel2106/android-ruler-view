@@ -27,6 +27,7 @@ import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.util.AttributeSet;
 import android.view.View;
+import android.widget.LinearLayout;
 
 /**
  * Created by Keval Patel on 28 Mar 2018.
@@ -306,11 +307,21 @@ final class RulerView extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         //Measure dimensions
         mViewHeight = MeasureSpec.getSize(heightMeasureSpec);
+
         int viewWidth = (mMaxValue - mMinValue + 2) * mIndicatorInterval;//+2 are artificially added to have more space for first and last indicator drawValueText()
 
         updateIndicatorHeight(mLongIndicatorHeightRatio, mShortIndicatorHeightRatio);
 
         this.setMeasuredDimension(viewWidth, mViewHeight);
+    }
+
+    /**
+     * Method that will trigger onMeasure to be recalled so that the view Width could be recalculated
+     */
+    public void triggerOnMeasure(){
+        LinearLayout.LayoutParams params = (LinearLayout.LayoutParams) this.getLayoutParams();
+        //params.width = mRulerView.calculateWidth();//would be usefull if onMeasure wouldn't get called
+        this.setLayoutParams(params);
     }
 
     /**
