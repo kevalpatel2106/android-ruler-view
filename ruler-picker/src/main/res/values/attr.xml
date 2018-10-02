@@ -26,6 +26,8 @@
     <attr name="indicator_color" format="color" />
     <attr name="indicator_width" format="dimension" />
 
+    <attr name="long_indicator_step" format="integer" />
+
     <attr name="notch_color" format="color" />
 
     <declare-styleable name="RulerView">
@@ -41,6 +43,8 @@
         <attr name="indicator_interval" />
         <attr name="indicator_color" />
         <attr name="indicator_width" />
+
+        <attr name="long_indicator_step" />
     </declare-styleable>
 
     <declare-styleable name="RulerValuePicker">
@@ -57,6 +61,8 @@
         <attr name="indicator_interval" />
         <attr name="indicator_color" />
         <attr name="indicator_width" />
+
+        <attr name="long_indicator_step" />
 
         <!-- Color of the top notch -->
         <attr name="notch_color" />
