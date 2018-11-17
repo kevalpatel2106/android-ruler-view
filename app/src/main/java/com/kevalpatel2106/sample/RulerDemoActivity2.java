@@ -45,12 +45,12 @@ public class RulerDemoActivity2 extends AppCompatActivity {
         heightPicker.selectValue(156);
         heightPicker.setValuePickerListener(new RulerValuePickerListener() {
             @Override
-            public void onValueChange(final int selectedValue) {
+            public void onValueChange(final float selectedValue) {
                 heightPickerValueTv.setText(selectedValue + " cms");
             }
 
             @Override
-            public void onIntermediateValueChange(final int selectedValue) {
+            public void onIntermediateValueChange(final float selectedValue) {
                 heightPickerValueTv.setText(selectedValue + " cms");
             }
         });
@@ -61,13 +61,13 @@ public class RulerDemoActivity2 extends AppCompatActivity {
         weightPicker.selectValue(55);
         weightPicker.setValuePickerListener(new RulerValuePickerListener() {
             @Override
-            public void onValueChange(final int selectedValue) {
+            public void onValueChange(final float selectedValue) {
                 weightPickerValueTv.setText(selectedValue + " kgs");
 
             }
 
             @Override
-            public void onIntermediateValueChange(final int selectedValue) {
+            public void onIntermediateValueChange(final float selectedValue) {
                 weightPickerValueTv.setText(selectedValue + " kgs");
 
             }

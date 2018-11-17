@@ -21,7 +21,7 @@ package com.kevalpatel2106.rulerpicker;
  */
 public interface RulerValuePickerListener {
 
-    void onValueChange(int selectedValue);
+    void onValueChange(float selectedValue);
 
-    void onIntermediateValueChange(int selectedValue);
+    void onIntermediateValueChange(float selectedValue);
 }

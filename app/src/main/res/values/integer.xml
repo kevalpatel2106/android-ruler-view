@@ -16,11 +16,13 @@
     <integer name="ruler_text_size_min_value">10</integer>
     <integer name="ruler_text_size_max_value">16</integer>
 
-    <fraction name="long_height_max_ratio_value">0.6</fraction>
-    <fraction name="long_height_min_ratio_value">0.9</fraction>
+    <fraction name="interval_hop">1</fraction>
 
-    <fraction name="short_height_max_ratio_value">0.6</fraction>
-    <fraction name="short_height_min_ratio_value">0.2</fraction>
+    <fraction name="long_height_max_ratio_value">0</fraction>
+    <fraction name="long_height_min_ratio_value">1</fraction>
+
+    <fraction name="short_height_max_ratio_value">0</fraction>
+    <fraction name="short_height_min_ratio_value">1</fraction>
 
     <integer name="interval_width_min_value">2</integer>
     <integer name="interval_width_max_value">6</integer>
@@ -28,6 +30,6 @@
     <integer name="interval_interval_min_value">10</integer>
     <integer name="interval_interval_max_value">30</integer>
 
-    <integer name="min_value">125</integer>
-    <integer name="max_value">350</integer>
+    <integer name="min_value">0</integer>
+    <integer name="max_value">100</integer>
 </resources>

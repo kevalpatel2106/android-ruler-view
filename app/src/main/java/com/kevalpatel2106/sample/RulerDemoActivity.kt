@@ -112,7 +112,7 @@ class RulerDemoActivity : AppCompatActivity() {
         long_indicator_size_picker.setProgress(ruler_value_picker.longIndicatorHeightRatio)
         long_indicator_size_picker.onProgressChangedListener = object : BubbleSeekBar.OnProgressChangedListener {
             override fun onProgressChanged(bubbleSeekBar: BubbleSeekBar?, progress: Int, progressFloat: Float) {
-                ruler_value_picker.setIndicatorHeight(progressFloat, short_indicator_size_picker.progressFloat)
+                ruler_value_picker.setIndicatorHeight(progressFloat, short_indicator_size_picker.progressFloat, 0.1.toFloat())
             }
 
             override fun getProgressOnActionUp(bubbleSeekBar: BubbleSeekBar?, progress: Int, progressFloat: Float) {
@@ -128,7 +128,7 @@ class RulerDemoActivity : AppCompatActivity() {
         short_indicator_size_picker.setProgress(ruler_value_picker.longIndicatorHeightRatio)
         short_indicator_size_picker.onProgressChangedListener = object : BubbleSeekBar.OnProgressChangedListener {
             override fun onProgressChanged(bubbleSeekBar: BubbleSeekBar?, progress: Int, progressFloat: Float) {
-                ruler_value_picker.setIndicatorHeight(long_indicator_size_picker.progressFloat, progressFloat)
+                ruler_value_picker.setIndicatorHeight(long_indicator_size_picker.progressFloat, progressFloat, 0.1.toFloat())
             }
 
             override fun getProgressOnActionUp(bubbleSeekBar: BubbleSeekBar?, progress: Int, progressFloat: Float) {
@@ -161,7 +161,7 @@ class RulerDemoActivity : AppCompatActivity() {
         indicator_interval_picker.onProgressChangedListener = object : BubbleSeekBar.OnProgressChangedListener {
             override fun onProgressChanged(bubbleSeekBar: BubbleSeekBar?, progress: Int, progressFloat: Float) {
                 ruler_value_picker.setIndicatorIntervalDistance(progress)
-                ruler_value_picker.selectValue(130)
+                ruler_value_picker.selectValue(10.toFloat())
             }
 
             override fun getProgressOnActionUp(bubbleSeekBar: BubbleSeekBar?, progress: Int, progressFloat: Float) {
@@ -211,15 +211,15 @@ class RulerDemoActivity : AppCompatActivity() {
 
         ruler_value_picker.setMinMaxValue(min_value_et.text.toString().toSafeInt(),
                 max_value_et.text.toString().toSafeInt())
-        ruler_value_picker.selectValue(130)
+        ruler_value_picker.selectValue(10.toFloat())
 
         ruler_value_picker.setValuePickerListener(object : RulerValuePickerListener {
-            override fun onValueChange(value: Int) {
+            override fun onValueChange(value: Float) {
                 Toast.makeText(this@RulerDemoActivity, "User height is :$value cms", Toast.LENGTH_LONG).show()
                 current_value_tv.text = "$value"
             }
 
-            override fun onIntermediateValueChange(selectedValue: Int) {
+            override fun onIntermediateValueChange(selectedValue: Float) {
                 current_value_tv.text = "$selectedValue"
             }
 

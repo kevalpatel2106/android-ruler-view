@@ -50,6 +50,7 @@
 
         <attr name="long_height_height_ratio" />
         <attr name="short_height_height_ratio" />
+        <attr name="interval_hop" />
 
         <attr name="ruler_text_color" />
         <attr name="ruler_text_size" />

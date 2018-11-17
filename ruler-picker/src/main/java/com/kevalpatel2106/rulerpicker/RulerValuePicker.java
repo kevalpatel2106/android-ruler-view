@@ -187,7 +187,9 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
                     setIndicatorHeight(a.getFraction(R.styleable.RulerValuePicker_long_height_height_ratio,
                             1, 1, 0.6f),
                             a.getFraction(R.styleable.RulerValuePicker_short_height_height_ratio,
-                                    1, 1, 0.4f));
+                                    1, 1, 0.4f),
+                            a.getFraction(R.styleable.RulerValuePicker_interval_hop,
+                                    1, 1, 1f));
                 }
 
                 if (a.hasValue(R.styleable.RulerValuePicker_min_value) ||
@@ -308,11 +310,11 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
      *              selected.If the value is greater than {@link #getMaxValue()}, {@link #getMaxValue()}
      *              will be selected.
      */
-    public void selectValue(final int value) {
+    public void selectValue(final float value) {
         mHorizontalScrollView.postDelayed(new Runnable() {
             @Override
             public void run() {
-                int valuesToScroll;
+                float valuesToScroll;
                 if (value < mRulerView.getMinValue()) {
                     valuesToScroll = 0;
                 } else if (value > mRulerView.getMaxValue()) {
@@ -322,7 +324,7 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
                 }
 
                 mHorizontalScrollView.smoothScrollTo(
-                        valuesToScroll * mRulerView.getIndicatorIntervalWidth(), 0);
+                        (int) valuesToScroll * mRulerView.getIndicatorIntervalWidth(), 0);
             }
         }, 400);
     }
@@ -330,9 +332,9 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
     /**
      * @return Get the current selected value.
      */
-    public int getCurrentValue() {
+    public float getCurrentValue() {
         int absoluteValue = mHorizontalScrollView.getScrollX() / mRulerView.getIndicatorIntervalWidth();
-        int value = mRulerView.getMinValue() + absoluteValue;
+        float value = (mRulerView.getMinValue() + absoluteValue) * mRulerView.getIntervalHop();
 
         if (value > mRulerView.getMaxValue()) {
             return mRulerView.getMaxValue();
@@ -552,7 +554,7 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
      * @see RulerView#mMinValue
      */
     @CheckResult
-    public int getMinValue() {
+    public float getMinValue() {
         return mRulerView.getMinValue();
     }
 
@@ -562,7 +564,7 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
      * @see RulerView#mMaxValue
      */
     @CheckResult
-    public int getMaxValue() {
+    public float getMaxValue() {
         return mRulerView.getMaxValue();
     }
 
@@ -605,7 +607,7 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
 
     /**
      * @return Ratio of long indicator height to the ruler height.
-     * @see #setIndicatorHeight(float, float)
+     * @see #setIndicatorHeight(float, float, float)
      * @see RulerView#mLongIndicatorHeightRatio
      */
     @CheckResult
@@ -615,7 +617,7 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
 
     /**
      * @return Ratio of short indicator height to the ruler height.
-     * @see #setIndicatorHeight(float, float)
+     * @see #setIndicatorHeight(float, float, float)
      * @see RulerView#mShortIndicatorHeight
      */
     @CheckResult
@@ -640,8 +642,9 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
      * @see #getShortIndicatorHeightRatio()
      */
     public void setIndicatorHeight(final float longHeightRatio,
-                                   final float shortHeightRatio) {
-        mRulerView.setIndicatorHeight(longHeightRatio, shortHeightRatio);
+                                   final float shortHeightRatio,
+                                   final float intervalHop) {
+        mRulerView.setIndicatorHeight(longHeightRatio, shortHeightRatio, intervalHop);
     }
 
     /**
@@ -670,7 +673,7 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
                     }
                 };
 
-        private int value = 0;
+        private float value = 0;
 
         SavedState(Parcelable superState) {
             super(superState);
@@ -678,13 +681,13 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
 
         private SavedState(Parcel in) {
             super(in);
-            value = in.readInt();
+            value = in.readFloat();
         }
 
         @Override
         public void writeToParcel(Parcel out, int flags) {
             super.writeToParcel(out, flags);
-            out.writeInt(value);
+            out.writeFloat(value);
         }
     }
 }

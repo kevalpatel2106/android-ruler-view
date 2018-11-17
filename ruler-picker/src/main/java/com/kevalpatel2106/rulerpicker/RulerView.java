@@ -73,19 +73,27 @@ final class RulerView extends View {
      * Minimum value. This value will be displayed at the left-most end of the ruler. This value
      * must be less than {@link #mMaxValue}.
      *
-     * @see #setValueRange(int, int)
+     * @see #setValueRange(float, float)
      * @see #getMinValue()
      */
-    private int mMinValue = 0 /* Default value */;
+    private float mMinValue = 0 /* Default value */;
 
     /**
      * Maximum value. This value will be displayed at the right-most end of the ruler. This value
      * must be greater than {@link #mMinValue}.
      *
-     * @see #setValueRange(int, int)
+     * @see #setValueRange(float, float)
      * @see #getMaxValue()
      */
-    private int mMaxValue = 100 /* Default maximum value */;
+    private float mMaxValue = 100 /* Default maximum value */;
+
+    /**
+     * Hightlighted value. This value will be displayed highlighted. This value
+     * must be greater than {@link #mMinValue}.
+     *
+     * @see #setHighlightedValue(Float)
+     */
+    private Float mHighlightedValue = null /* Default null */;
 
     /**
      * Ratio of long indicator height to the ruler height. This value must be between 0 to 1. The
@@ -93,7 +101,7 @@ final class RulerView extends View {
      * If the value is 0, indicator won't be displayed. If the value is 1, indicator height will be
      * same as the ruler height.
      *
-     * @see #setIndicatorHeight(float, float)
+     * @see #setIndicatorHeight(float, float, float)
      * @see #getLongIndicatorHeightRatio()
      */
     private float mLongIndicatorHeightRatio = 0.6f /* Default value */;
@@ -104,7 +112,7 @@ final class RulerView extends View {
      * If the value is 0, indicator won't be displayed. If the value is 1, indicator height will be
      * same as the ruler height.
      *
-     * @see #setIndicatorHeight(float, float)
+     * @see #setIndicatorHeight(float, float, float)
      * @see #getShortIndicatorHeightRatio()
      */
     private float mShortIndicatorHeightRatio = 0.4f /* Default value */;
@@ -113,7 +121,7 @@ final class RulerView extends View {
      * Actual height of the long indicator in pixels. This height is derived from
      * {@link #mLongIndicatorHeightRatio}.
      *
-     * @see #updateIndicatorHeight(float, float)
+     * @see #updateIndicatorHeight(float, float, float)
      */
     private int mLongIndicatorHeight = 0;
 
@@ -121,9 +129,17 @@ final class RulerView extends View {
      * Actual height of the short indicator in pixels. This height is derived from
      * {@link #mShortIndicatorHeightRatio}.
      *
-     * @see #updateIndicatorHeight(float, float)
+     * @see #updateIndicatorHeight(float, float, float)
      */
     private int mShortIndicatorHeight = 0;
+
+    /**
+     * Distance interval hop
+     *
+     * @see #setIndicatorIntervalDistance(int)
+     * @see #getIndicatorIntervalWidth()
+     */
+    private float mIntervalHop = 10 /* Default value */;
 
     /**
      * Integer color of the text, that is displayed on the ruler.
@@ -227,7 +243,7 @@ final class RulerView extends View {
                     mShortIndicatorHeightRatio = a.getFraction(R.styleable.RulerView_short_height_height_ratio,
                             1, 1, 0.4f);
                 }
-                setIndicatorHeight(mLongIndicatorHeightRatio, mShortIndicatorHeightRatio);
+                setIndicatorHeight(mLongIndicatorHeightRatio, mShortIndicatorHeightRatio, mIntervalHop);
 
                 if (a.hasValue(R.styleable.RulerView_min_value)) {
                     mMinValue = a.getInteger(R.styleable.RulerView_min_value, 0);
@@ -264,7 +280,13 @@ final class RulerView extends View {
     @Override
     protected void onDraw(Canvas canvas) {
         //Iterate through all value
-        for (int value = 1; value < mMaxValue - mMinValue; value++) {
+        float count = (mMaxValue - mMinValue) / mIntervalHop;
+        for (int value = 1; value < count; value++) {
+            float drawableValue = mMinValue + value * mIntervalHop;
+
+            if (mHighlightedValue != null && drawableValue == mHighlightedValue) {
+                drawHighlightValue(canvas, value);
+            }
 
             if (value % 5 == 0) {
                 drawLongIndicator(canvas, value);
@@ -286,11 +308,11 @@ final class RulerView extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         //Measure dimensions
         mViewHeight = MeasureSpec.getSize(heightMeasureSpec);
-        int viewWidth = (mMaxValue - mMinValue - 1) * mIndicatorInterval;
+        float viewWidth = (mMaxValue - mMinValue - 1) * mIndicatorInterval;
 
-        updateIndicatorHeight(mLongIndicatorHeightRatio, mShortIndicatorHeightRatio);
+        updateIndicatorHeight(mLongIndicatorHeightRatio, mShortIndicatorHeightRatio, mIntervalHop);
 
-        this.setMeasuredDimension(viewWidth, mViewHeight);
+        this.setMeasuredDimension((int) viewWidth, mViewHeight);
     }
 
     /**
@@ -300,10 +322,11 @@ final class RulerView extends View {
      * @param shortIndicatorHeightRatio Ratio of short indicator height to the ruler height.
      */
     private void updateIndicatorHeight(final float longIndicatorHeightRatio,
-                                       final float shortIndicatorHeightRatio) {
+                                       final float shortIndicatorHeightRatio,
+                                       final float intervalHop) {
         mLongIndicatorHeight = (int) (mViewHeight * longIndicatorHeightRatio);
         mShortIndicatorHeight = (int) (mViewHeight * shortIndicatorHeightRatio);
-
+        mIntervalHop = intervalHop;
     }
 
     /**
@@ -318,6 +341,12 @@ final class RulerView extends View {
                 0,
                 mIndicatorInterval * value,
                 mShortIndicatorHeight,
+                mIndicatorPaint);
+
+        canvas.drawLine(mIndicatorInterval * value,
+                mViewHeight - mShortIndicatorHeight,
+                mIndicatorInterval * value,
+                mViewHeight,
                 mIndicatorPaint);
     }
 
@@ -334,6 +363,12 @@ final class RulerView extends View {
                 mIndicatorInterval * value,
                 mLongIndicatorHeight,
                 mIndicatorPaint);
+
+        canvas.drawLine(mIndicatorInterval * value,
+                mViewHeight - mLongIndicatorHeight,
+                mIndicatorInterval * value,
+                mViewHeight,
+                mIndicatorPaint);
     }
 
     /**
@@ -345,10 +380,26 @@ final class RulerView extends View {
      */
     private void drawValueText(@NonNull final Canvas canvas,
                                final int value) {
-        canvas.drawText(String.valueOf(value + mMinValue),
+        canvas.drawText(String.valueOf(value * mIntervalHop + mMinValue),
                 mIndicatorInterval * value,
-                mLongIndicatorHeight + mTextPaint.getTextSize(),
+                (mViewHeight / 2) + (mTextPaint.getTextSize() / 2),
                 mTextPaint);
+    }
+
+    /**
+     * Draw the value number below the longer indicator. This will use {@link #mTextPaint} to draw
+     * the text.
+     *
+     * @param canvas {@link Canvas} on which the text will be drawn.
+     * @param value  Value to draw.
+     */
+    private void drawHighlightValue(@NonNull final Canvas canvas,
+                               final float value) {
+        canvas.drawLine(mIndicatorInterval * value,
+                0,
+                mIndicatorInterval * value,
+                mViewHeight,
+                mIndicatorPaint);
     }
 
     /////////////////////// Properties getter/setter ///////////////////////
@@ -435,19 +486,19 @@ final class RulerView extends View {
 
     /**
      * @return Get the minimum value displayed on the ruler.
-     * @see #setValueRange(int, int)
+     * @see #setValueRange(float, float)
      */
     @CheckResult
-    int getMinValue() {
+    float getMinValue() {
         return mMinValue;
     }
 
     /**
      * @return Get the maximum value displayed on the ruler.
-     * @see #setValueRange(int, int)
+     * @see #setValueRange(float, float)
      */
     @CheckResult
-    int getMaxValue() {
+    float getMaxValue() {
         return mMaxValue;
     }
 
@@ -460,9 +511,20 @@ final class RulerView extends View {
      * @param maxValue Value to display at the right end of the ruler. This can be positive, negative
      *                 or zero.This value must be greater than min value. Default minimum value is 100.
      */
-    void setValueRange(final int minValue, final int maxValue) {
+    void setValueRange(final float minValue, final float maxValue) {
         mMinValue = minValue;
         mMaxValue = maxValue;
+        invalidate();
+    }
+
+    /**
+     * Set the maximum value to display on the ruler. This will decide the range of values and number
+     * of indicators that ruler will draw.
+     *
+     * @param highlightedValue Value highlight. Default value is null.
+     */
+    void setHighlightedValue(final Float highlightedValue) {
+        mHighlightedValue = highlightedValue;
         invalidate();
     }
 
@@ -491,7 +553,7 @@ final class RulerView extends View {
 
     /**
      * @return Ratio of long indicator height to the ruler height.
-     * @see #setIndicatorHeight(float, float)
+     * @see #setIndicatorHeight(float, float, float)
      */
     @CheckResult
     float getLongIndicatorHeightRatio() {
@@ -500,11 +562,20 @@ final class RulerView extends View {
 
     /**
      * @return Ratio of short indicator height to the ruler height.
-     * @see #setIndicatorHeight(float, float)
+     * @see #setIndicatorHeight(float, float, float)
      */
     @CheckResult
     float getShortIndicatorHeightRatio() {
         return mShortIndicatorHeightRatio;
+    }
+
+    /**
+     * @return Interval hop.
+     * @see #setIndicatorHeight(float, float, float)
+     */
+    @CheckResult
+    float getIntervalHop() {
+        return mIntervalHop;
     }
 
     /**
@@ -523,7 +594,8 @@ final class RulerView extends View {
      * @throws IllegalArgumentException if any of the parameter is invalid.
      */
     void setIndicatorHeight(final float longHeightRatio,
-                            final float shortHeightRatio) {
+                            final float shortHeightRatio,
+                            final float intervalHop) {
 
         if (shortHeightRatio < 0 || shortHeightRatio > 1) {
             throw new IllegalArgumentException("Sort indicator height must be between 0 to 1.");
@@ -539,8 +611,9 @@ final class RulerView extends View {
 
         mLongIndicatorHeightRatio = longHeightRatio;
         mShortIndicatorHeightRatio = shortHeightRatio;
+        mIntervalHop = intervalHop;
 
-        updateIndicatorHeight(mLongIndicatorHeightRatio, mShortIndicatorHeightRatio);
+        updateIndicatorHeight(mLongIndicatorHeightRatio, mShortIndicatorHeightRatio, mIntervalHop);
 
         invalidate();
     }
