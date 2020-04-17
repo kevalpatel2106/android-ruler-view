@@ -240,7 +240,6 @@ final class RulerView extends View {
                 a.recycle();
             }
         }
-        refreshPaint();
     }
 
     /**
@@ -464,6 +463,7 @@ final class RulerView extends View {
         mMinValue = minValue;
         mMaxValue = maxValue;
         invalidate();
+        refreshPaint();
     }
 
     /**
