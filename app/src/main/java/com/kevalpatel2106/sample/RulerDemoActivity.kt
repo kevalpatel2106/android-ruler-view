@@ -224,6 +224,19 @@ class RulerDemoActivity : AppCompatActivity() {
             }
 
         })
+
+        infinite_ruler_value_picker.setValuePickerListener(object : RulerValuePickerListener {
+            override fun onValueChange(value: Int) {
+                current_value_tv_infinite.text = "$value"
+                infinite_ruler_value_picker.setMinMaxValue(0, value + 200)
+                infinite_ruler_value_picker.selectValue(value)
+            }
+
+            override fun onIntermediateValueChange(selectedValue: Int) {
+                current_value_tv_infinite.text = "$selectedValue"
+            }
+
+        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
