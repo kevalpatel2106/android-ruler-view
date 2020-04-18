@@ -15,7 +15,7 @@ apply plugin: 'com.android.library'
 apply plugin: 'com.github.dcendents.android-maven'
 
 android {
-    compileSdkVersion 29
+    compileSdkVersion 28
 
     // This is important, it will run lint checks but won't abort build
     lintOptions {
@@ -24,7 +24,7 @@ android {
 
     defaultConfig {
         minSdkVersion 14
-        targetSdkVersion 29
+        targetSdkVersion 28
         consumerProguardFiles 'proguard-rules.pro'
     }
 }
