@@ -14,7 +14,7 @@
 package com.kevalpatel2106.rulerpicker;
 
 import android.content.Context;
-import androidx.annotation.NonNull;
+import android.support.annotation.NonNull;
 
 /**
  * Created by Kevalpatel2106 on 28-Mar-18.

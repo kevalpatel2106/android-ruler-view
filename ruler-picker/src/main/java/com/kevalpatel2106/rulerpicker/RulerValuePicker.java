@@ -23,13 +23,13 @@ import android.graphics.Path;
 import android.os.Build;
 import android.os.Parcel;
 import android.os.Parcelable;
-import androidx.annotation.CheckResult;
-import androidx.annotation.ColorInt;
-import androidx.annotation.ColorRes;
-import androidx.annotation.DimenRes;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import androidx.core.content.ContextCompat;
+import android.support.annotation.CheckResult;
+import android.support.annotation.ColorInt;
+import android.support.annotation.ColorRes;
+import android.support.annotation.DimenRes;
+import android.support.annotation.NonNull;
+import android.support.annotation.Nullable;
+import android.support.v4.content.ContextCompat;
 import android.util.AttributeSet;
 import android.view.View;
 import android.view.ViewGroup;
@@ -169,10 +169,6 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
 
                 if (a.hasValue(R.styleable.RulerValuePicker_indicator_color)) {
                     setIndicatorColor(a.getColor(R.styleable.RulerValuePicker_indicator_color, Color.WHITE));
-                }
-
-                if (a.hasValue(R.styleable.RulerValuePicker_long_indicator_color)){
-                    setLongIndicatorColor(a.getColor(R.styleable.RulerValuePicker_long_indicator_color, Color.WHITE));
                 }
 
                 if (a.hasValue(R.styleable.RulerValuePicker_indicator_width)) {
@@ -506,10 +502,6 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
         mRulerView.setIndicatorColor(color);
     }
 
-    public void setLongIndicatorColor(@ColorInt final int color){
-        mRulerView.setLongIndicatorColor(color);
-    }
-
     /**
      * Set the indicator color.
      *
@@ -667,8 +659,8 @@ public final class RulerValuePicker extends FrameLayout implements ObservableHor
      */
     public static class SavedState extends BaseSavedState {
 
-        public static final Creator<SavedState> CREATOR =
-                new Creator<SavedState>() {
+        public static final Parcelable.Creator<SavedState> CREATOR =
+                new Parcelable.Creator<SavedState>() {
                     public SavedState createFromParcel(Parcel in) {
                         return new SavedState(in);
                     }
