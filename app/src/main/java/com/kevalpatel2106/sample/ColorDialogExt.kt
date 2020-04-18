@@ -15,7 +15,8 @@ package com.kevalpatel2106.sample
 
 import android.app.Activity
 import android.graphics.Color
-import android.support.annotation.StringRes
+import androidx.annotation.StringRes
+import androidx.fragment.app.FragmentActivity
 import com.jaredrummler.android.colorpicker.ColorPickerDialog
 import com.jaredrummler.android.colorpicker.ColorPickerDialogListener
 import com.jaredrummler.android.colorpicker.ColorShape
@@ -31,7 +32,7 @@ internal const val TEXT_COLOR_PICKER_DIALOG_ID = 1
 internal const val INDICATOR_COLOR_PICKER_DIALOG_ID = 2
 
 fun createColorPicker(
-        activity: Activity,
+        activity: FragmentActivity,
         @StringRes titleRes: Int,
         dialogId: Int,
         listener: ColorPickerDialogListener
@@ -59,5 +60,5 @@ fun createColorPicker(
             .create()
 
     dialog.setColorPickerDialogListener(listener)
-    dialog.show(activity.fragmentManager, dialogId.toString())
+    dialog.show(activity.supportFragmentManager, dialogId.toString())
 }
