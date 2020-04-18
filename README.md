@@ -88,9 +88,9 @@ rulerValuePicker.setValuePickerListener(object : RulerValuePickerListener {
 
 ## Screenshots:
 
-|Sample 1|Sample 2|
+|Sample 1|Sample 2|Sample 3|
 |:---:|:---:|
-|![profile-demo.gif](/.github/ruler-view-profile-demo-small.gif)|![ruler-view-demo.gif](/.github/ruler-view-demo-small.gif)|
+|![profile-demo.gif](/.github/ruler-view-profile-demo-small.gif)|![ruler-view-demo.gif](/.github/ruler-view-demo-small.gif)|![vertical-ruler-view.gif](/.github/vertical-ruler-view.gif)|
 
 
 ## What to try this out?

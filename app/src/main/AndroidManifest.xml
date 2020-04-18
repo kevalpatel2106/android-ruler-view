@@ -30,6 +30,10 @@
             android:theme="@style/AppTheme.NoActionbar"
             android:windowSoftInputMode="stateHidden" />
         <activity
+            android:name=".VerticalDemoActivity"
+            android:theme="@style/AppTheme.NoActionbar"
+            android:windowSoftInputMode="stateHidden" />
+        <activity
             android:name=".MainActivity"
             android:theme="@style/AppTheme"
             android:windowSoftInputMode="stateHidden">

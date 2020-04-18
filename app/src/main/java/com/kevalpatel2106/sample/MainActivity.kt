@@ -31,5 +31,9 @@ class MainActivity : AppCompatActivity() {
         btn_profile_sample.setOnClickListener {
             startActivity(Intent(this@MainActivity, RulerDemoActivity2::class.java))
         }
+
+        btn_vertical_sample.setOnClickListener {
+            startActivity(Intent(this@MainActivity, VerticalDemoActivity::class.java))
+        }
     }
 }
