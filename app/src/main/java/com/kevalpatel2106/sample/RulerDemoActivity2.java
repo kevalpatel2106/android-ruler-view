@@ -18,6 +18,8 @@ import android.support.design.widget.TextInputEditText;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.MenuItem;
+import android.widget.CompoundButton;
+import android.widget.RadioButton;
 import android.widget.TextView;
 
 import com.kevalpatel2106.rulerpicker.RulerValuePicker;
@@ -29,7 +31,7 @@ public class RulerDemoActivity2 extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ruler_demo2);
-
+        checkGender();
         setSupportActionBar((Toolbar) findViewById(R.id.toolbar));
         if (getSupportActionBar() != null) {
             getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -70,6 +72,29 @@ public class RulerDemoActivity2 extends AppCompatActivity {
             public void onIntermediateValueChange(final int selectedValue) {
                 weightPickerValueTv.setText(selectedValue + " kgs");
 
+            }
+        });
+    }
+
+    private void checkGender() {
+        final RadioButton male = findViewById(R.id.male);
+        final RadioButton female = findViewById(R.id.female);
+        male.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    female.setChecked(false);
+                }
+            }
+        });
+        female.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked) {
+                    male.setChecked(false);
+                }
             }
         });
     }

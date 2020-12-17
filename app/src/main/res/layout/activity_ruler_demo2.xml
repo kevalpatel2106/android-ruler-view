@@ -221,12 +221,14 @@
             app:layout_constraintTop_toBottomOf="@+id/textView3">
 
             <RadioButton
+                android:id="@+id/male"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Male"
                 android:textColor="@android:color/white" />
 
             <RadioButton
+                android:id="@+id/female"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="16dp"
