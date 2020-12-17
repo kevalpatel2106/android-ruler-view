@@ -74,6 +74,7 @@ public class RulerDemoActivity2 extends AppCompatActivity {
 
             }
         });
+        checkGender();
     }
 
     private void checkGender() {
